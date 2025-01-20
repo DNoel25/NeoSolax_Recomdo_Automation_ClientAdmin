@@ -11,12 +11,12 @@ class BaseTest:
         driver_path = r"C:\Users\neosolax\Downloads\chromedriver-win64 (2)\chromedriver-win64\chromedriver.exe"
         service = Service(driver_path)
         cls.driver = webdriver.Chrome(service=service)
-        cls.driver.get("https://demoapi1.recomdo.ai/client-admin")
+        cls.driver.get("https://demoapi2.recomdo.ai/client-admin")
         cls.driver.maximize_window()
 
         # Perform login once
         login_page = LoginPage(cls.driver)
-        login_page.login("NewKiddoz", "Ratkiller400@")
+        login_page.login("abans_client", "Porsche9000#")
         print("Login successful and setup complete.")
 
     @classmethod

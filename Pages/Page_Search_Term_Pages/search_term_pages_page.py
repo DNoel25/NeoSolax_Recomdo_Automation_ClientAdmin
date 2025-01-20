@@ -1,4 +1,6 @@
-from selenium.webdriver.support.ui import Select 
+from selenium.common import TimeoutException
+from selenium.webdriver import ActionChains
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -6,10 +8,15 @@ from Pages.locators import Locators
 from Pages.sidebar_page import SideNavigationPage
 import logging
 import time
+from selenium.webdriver.common.keys import Keys
 
 class SearchTermPages:
     def __init__(self, driver):
         self.driver = driver
+        # Define the frame locator
+        self.frame_locator = (By.CSS_SELECTOR, "iframe.note-editor.note-frame")  # Adjust this if necessary
+        # Define the contenteditable div locator
+        self.editable_div_locator = (By.CSS_SELECTOR, "div.note-editable[contenteditable='true']")
     
     def is_search_term_pages_heading_there(self):
         time.sleep(5) 
@@ -85,7 +92,7 @@ class SearchTermPages:
             # Wait for the search results to be displayed in the grid
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_all_elements_located((By.XPATH, "//table[@id='allPageTable']/tbody/tr"))
-            ) 
+            )
             time.sleep(2)
             # Fetch all rows in the grid
             rows = self.driver.find_elements(By.XPATH, "//table[@id='allPageTable']/tbody/tr")
@@ -113,6 +120,26 @@ class SearchTermPages:
         WebDriverWait(self.driver, 30).until(
             EC.presence_of_element_located(Locators.STAP_PAGINATION_CONTAINER)
         )
+
+    def no_of_rows(self):
+        try:
+            # Wait for the search results to be displayed in the grid
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_all_elements_located((By.XPATH, "//table[@id='allPageTable']/tbody/tr"))
+            )
+            time.sleep(2)
+            # Fetch all rows in the grid
+            rows = self.driver.find_elements(By.XPATH, "//table[@id='allPageTable']/tbody/tr")
+
+            # Check if the number of rows is greater than 10
+            if len(rows) > 10:
+                return True
+            else:
+                print(f"Number of rows is {len(rows)}, which is not greater than 10 So the pagination testing will not be there.")
+                return False
+        except Exception as e:
+            print(f"The error is: {e}")
+            return False
 
     def get_active_page(self):
         active_page = self.driver.find_element(By.CSS_SELECTOR, ".paginate_button.current")
@@ -168,7 +195,7 @@ class SearchTermPages:
         addnew_button.click()
         time.sleep(2)
 
-    def fill_general(self, title, store_value):
+    def fill_general(self, title, keyword, store_value):
         print("1")
         # Enable SEO Page
         # checkbox = self.driver.find_element(*Locators.STCN_ENABLE_SEO_CHECKBOX) 
@@ -180,21 +207,181 @@ class SearchTermPages:
         )
         if active.is_selected():
             active.click()
-                
-        print("2")
         #Fill title
-        self.driver.find_element({title}).send_keys(title)
-        
+        title_element = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, '//*[@id="category_name"]'))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", title_element)
+        title_element.clear()
+        title_element.send_keys({title})
         #Fill keyword
-        self.driver.find_element(*self.KEYWORD_INPUT).send_keys(keyword)
+        keyword_element = (self.driver.find_element(By.XPATH, '//*[@id="search_keyword"]'))
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", keyword_element)
+        keyword_element.clear()
+        keyword_element.send_keys(keyword)
+        store_dropdown = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located(Locators.STCN_STORE_VIEW_DROPDOWN)
+        )
 
-        #Select the store view
-        dropdown = Select(self.driver.find_element(*Locators.STCN_STORE_VIEW_DROPDOWN))
-        dropdown.select_by_value({{store_value}})
+        # Ensure the dropdown is scrolled into view
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
+                                   store_dropdown)
+
+        # Click to open the dropdown
+        store_dropdown.click()
+
+        try:
+            # Wait for the option with the value attribute to be clickable
+            option = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, f"//option[@value='{store_value}']"))
+            )
+
+            # Click the option
+            option.click()
+
+        except TimeoutException:
+            print(f"Timeout: Could not find or click the option with value '{store_value}'.")
+            # You can also add more debugging information here if needed
+            # Use JavaScript to click the element if it's not clickable
+            self.driver.execute_script(f"arguments[0].querySelector('option[value=\"{store_value}\"]').click();",
+                                       store_dropdown)
+        print("5")
+        time.sleep(5)
+
+        content_tab = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="seo_page_create"]/div/ul/li[2]/a'))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
+                                   content_tab)
+        content_tab.click()
+        time.sleep(2)
+        print("Filled the general details and moved to content tab successfuly..")
+
+    #all the upload image in content realted
+    # Locators
+    upload_button_locator = (By.ID, "upload_btn")
+    file_input_locator = (By.ID, "file_input")
+    preview_image_locator = (By.ID, "preview_image")
+    file_details_locator = (By.ID, "file_details")
+    delete_button_locator = (By.ID, "action-remove")
 
 
-    def fill_content()
+    def upload_image(self, file_path):
+        """
+        Uploads an image file using the file input element.
 
-    def fill_SEO()
+        :param file_path: The absolute path of the image file to upload.
+            """
+        file_input = self.driver.find_element(*self.file_input_locator)
+        file_input.send_keys(file_path)
+        time.sleep(3)
 
-    def fill_
+    def is_preview_image_displayed(self):
+        """
+        Checks if the preview image is displayed after upload.
+
+        :return: True if the preview image is displayed, False otherwise.
+        """
+        preview_image = self.driver.find_element(*self.preview_image_locator)
+        time.sleep(3)
+        return preview_image.get_attribute("src") != ""
+
+    def get_file_details(self):
+        """
+        Retrieves the file details displayed after uploading the image.
+
+        :return: The text content of the file details element.
+        """
+        file_details = self.driver.find_element(*self.file_details_locator)
+        time.sleep(3)
+        return file_details.text
+
+    def delete_image(self):
+
+        self.driver.save_screenshot("debug_screenshot.png")
+        """
+        Deletes the uploaded image using the delete button.
+        """
+        delete_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(self.delete_button_locator)
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", delete_button)
+        delete_button.click()
+
+    #all the content description realed functions
+    def switch_to_note_frame(self):
+        """
+        Switches the WebDriver's context to the note-editor iframe.
+        """
+        WebDriverWait(self.driver, 10).until(
+            EC.frame_to_be_available_and_switch_to_it(self.frame_locator)
+        )
+
+    def enter_description(self, description_text):
+        """
+        Enters the description text inside the note-editor contenteditable div.
+
+        :param description_text: Text to be entered inside the editor.
+        """
+        # Wait for the contenteditable div to be present
+        editable_div = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located(self.editable_div_locator)
+        )
+        # Clear any existing text
+        self.driver.execute_script("arguments[0].innerHTML = '';", editable_div)
+        # Enter new text
+        editable_div.send_keys(description_text)
+
+    def switch_to_default_content(self):
+        """
+        Switches the WebDriver's context back to the default content.
+        """
+        self.driver.switch_to.default_content()
+
+
+    # def is_image_deleted(self):
+    #     """
+    #     Checks if the preview image has been removed after clicking delete.
+    #
+    #     :return: True if the preview image is not displayed, False otherwise.
+    #     """
+    #     time.sleep(2)  # Wait for the deletion process to complete
+    #     preview_image = self.driver.find_element(*self.preview_image_locator)
+    #     return preview_image.get_attribute("src") == ""
+
+
+    def fill_seo_fields(self):
+        seo_tab = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="seo_page_create"]/div/ul/li[4]/a'))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
+                                   seo_tab)
+        seo_tab.click()
+        time.sleep(2)
+
+        metatitle  = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID, 'meta_title'))
+        )
+        metatitle.clear()
+        metatitle.send_keys("test automation metat title")
+
+        metkeywords = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID, 'meta_keywords'))
+        )
+        metkeywords.clear()
+        metkeywords.send_keys("test automation metat title")
+
+        metacontent = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID, 'meta_content'))
+        )
+        metacontent.clear()
+        metacontent.send_keys("test automation metat title")
+
+        metadescription = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID, 'meta_description'))
+        )
+        metadescription.clear()
+        metadescription.send_keys("test automation metat title")
+        print("Successfully filled the SEO fields")
+
+    # def fill_
