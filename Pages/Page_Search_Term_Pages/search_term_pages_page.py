@@ -1,3 +1,5 @@
+import os
+
 from selenium.common import TimeoutException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
@@ -381,7 +383,51 @@ class SearchTermPages:
             EC.visibility_of_element_located((By.ID, 'meta_description'))
         )
         metadescription.clear()
-        metadescription.send_keys("test automation metat title")
+        metadescription.send_keys("test automation meta title")
         print("Successfully filled the SEO fields")
 
-    # def fill_
+    def redirection_save(self):
+        p_grid_sorting = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="seo_page_create"]/div/ul/li[5]/a'))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
+                                   p_grid_sorting)
+        p_grid_sorting.click()
+        time.sleep(8)
+        print("Filled the general details and moved to page grid & sorting tab successfully..")
+
+        self.take_screenshot("./screenshots/search_term_page/", "productgrid_and_sorting")
+
+    def take_screenshot(self, directory, prefix):
+        """
+        Takes a screenshot of the current browser window and saves it in a specified directory.
+
+        :param self: The WebDriver instance.
+        :param directory: The directory where the screenshot will be saved.
+        :param prefix: The prefix for the screenshot file name.
+        """
+        # Create the directory if it doesn't exist
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        # Generate a timestamp for the file name
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+
+        # Construct the full file path
+        file_name = f"{prefix}_{timestamp}.png"
+        file_path = os.path.join(directory, file_name)
+
+        # Take the screenshot
+        self.driver.save_screenshot(file_path)
+        print(f"Screenshot saved at: {file_path}")
+
+        return file_path
+
+    def save(self):
+        save_btn = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.ID, 'save_page'))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
+                                   save_btn)
+        save_btn.click()
+        time.sleep(5)
