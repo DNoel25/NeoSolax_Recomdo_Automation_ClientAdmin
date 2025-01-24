@@ -1,4 +1,5 @@
 # Pages/manual_suggestions_page.py
+from selenium.common import TimeoutException, NoSuchElementException
 from selenium.webdriver.support.ui import Select 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -78,6 +79,7 @@ class LayeredNavigationPage:
         sort_option = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable(Locators.CM_SORTOPTION_LAYERED)
         )
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", sort_option)
         sort_option.click()
         Select(sort_option).select_by_visible_text(sortOption)
         
@@ -193,7 +195,7 @@ class LayeredNavigationPage:
         try:
             # Fetch all filtered items in the assigned list
             assigned_items = self.driver.find_elements(By.CSS_SELECTOR, ".sortable-list.assigned-list .assigned_attribute_one")
-            print(f"Got {len(assigned_items)} filtered items in the assigned attributes listsss.")
+            print(f"Got {len(assigned_items)} filtered items in the assigned attributes lists.")
 
             if (len(assigned_items)) > 1:
                 # Locate the input field for the searched attribute (e.g., 'Age')
@@ -454,46 +456,35 @@ class LayeredNavigationPage:
         :return: The updated list of manually sorted product elements.
         """
         try:
-            print("1")
             # Find all products in the grid
             product_elements = self.driver.find_elements(By.XPATH, "//div[contains(@class, 'grid-item')]")
-            print("2")
             # Filter manually sorted products
             manually_sorted_products = [
                 product for product in product_elements
                 if "manual_sort" in product.get_attribute("class")
             ]
-            print("3")
             # Check if there are at least 3 manually sorted products
             if len(manually_sorted_products) >= 3:
-                print("4")
                 logging.info("There are already 3 or more manually sorted products.")
                 return manually_sorted_products
-            print("5")
             # Find additional products to convert to manual sort
             additional_needed = 3 - len(manually_sorted_products)
             logging.info(f"Adding {additional_needed} products to manual sort.")
-            print("6")
             # Find automatic sorted products to convert
             auto_sorted_products = [
                 product for product in product_elements
                 if "automatic_sort" in product.get_attribute("class")
             ]
-            print("7")
             for i in range(additional_needed):
-                print("8")
                 if i < len(auto_sorted_products):
-                    print("9")
                     # # Locate the manual-auto checkbox for the product
                     # checkbox = auto_sorted_products[i].find_element(By.XPATH, ".//input[@class='auto_manual_check_box']")
                     # Locate the manual-auto checkbox for the product
                     checkbox = auto_sorted_products[i].find_element(By.XPATH, ".//div[@class='sort_option_toggle']//input[@class='auto_manual_check_box']")
-
-                    print("10")
                     # Click the checkbox to convert to manual sort
                     checkbox.click()
                     logging.info(f"Converted product with data-id: {auto_sorted_products[i].get_attribute('data-id')} to manual sort.")
-                    print("11")
+
                     # Wait for the change to apply
                     time.sleep(2)  # Replace with explicit wait if needed
 
