@@ -38,7 +38,7 @@ class TestSearchTerms(BaseTest):
 
         def test_search_functionality(self):
             ai_suggestion_page = AI_Suggestion(self.driver)
-            ai_suggestion_page.search_in_grid("health-safety-ecoclean")
+            ai_suggestion_page.search_in_grid("smart thermostat")
             # Add assertions for verifying search results in the grid
 
         def test_pagination(self):
