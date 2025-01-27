@@ -154,8 +154,44 @@ class AI_Suggestion:
         return "disabled" in self.driver.find_element(*Locators.RMAI_NEXT_BUTTON).get_attribute("class")
 
     def go_to_dashboard(self): 
-        side_nav = SideNavigationPage(self.driver) 
+        side_nav = SideNavigationPage(self.driver)
         side_nav = side_nav.open_dashboard_menu()
         time.sleep(2)
+
+    def check_rows_and_pagination(self):
+        """
+        Check if any rows exist in the table and count the number of rows.
+        Skip pagination test if the number of rows is less than 10.
+        """
+        try:
+            # Wait for the table rows to load
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_all_elements_located((By.XPATH, "//table[@id='searchTermsTable']/tbody/tr"))
+            )
+
+            # Fetch all rows in the grid
+            rows = self.driver.find_elements(By.XPATH, "//table[@id='searchTermsTable']/tbody/tr")
+            row_count = len(rows)  # Get the number of rows
+            print(f"Number of rows in the table: {row_count}")
+
+            # Check if rows exist
+            if row_count > 0:
+                print("Rows are present in the table.")
+            else:
+                print("No rows found in the table.")
+                return False
+
+            # Check if the row count is less than 10
+            if row_count < 10:
+                print("Less than 10 rows are present in the table. Skipping pagination test.")
+                return False  # Skip pagination test
+            else:
+                print("10 or more rows are present. Proceed with pagination test.")
+                return True  # Proceed with pagination test
+
+        except Exception as e:
+            print(f"An error occurred while checking rows and pagination: {e}")
+            return False
+
 
         

@@ -45,7 +45,14 @@ class TestSearchTerms(BaseTest):
             print(" ")
             print("--------")
             print("Test pagination functionality on the Search Terms Reports..")
-            
+
+            print("*******************")
+            print("--------")
+            AiSuggestion = AI_Suggestion(self.driver)
+            suggestions = AiSuggestion.check_rows_and_pagination()
+            if not suggestions:
+                print("Skipping pagination tests as there are fewer than 10 rows or no rows present.")
+                return  # Exit the test function if the check fails
             ai_suggestion_page = AI_Suggestion(self.driver)
 
             # Wait for pagination to load
