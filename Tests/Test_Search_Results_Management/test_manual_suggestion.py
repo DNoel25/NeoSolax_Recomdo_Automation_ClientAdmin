@@ -28,6 +28,28 @@ class TestManualSuggestions(BaseTest):
             manual_page = ManualSuggestionsPage(self.driver)
             assert manual_page.is_grid_displayed(), "Grid is not displayed on Manual Suggestions page."
 
+        def test_add_new_suggestion(self):
+            add_new_page = ManualSuggestionsPage(self.driver)
+
+            # Step 1: Click "Add New"
+            add_new_page.click_add_new()
+
+            # Step 2: Fill the form
+            store_view = "Default Store View"  # or any specific store view
+            keyword = "new_keyword"
+            synonyms = ["synonym3"]
+            weights = ["15"]
+            time.sleep(2)
+            add_new_page.fill_form(store_view, keyword, synonyms, weights)
+            print("filled the add new form")
+            # Step 3: Submit and verify
+            time.sleep(5)
+
+            add_new_page.submit_form()
+            print("clicked the submit")
+            time.sleep(10)
+            # assert add_new_page.verify_success_message(), "Success message not displayed or incorrect."
+
         def test_show_entries_options(self):
             manual_page = ManualSuggestionsPage(self.driver)
             for value in [10, 25, 50, 100]:
@@ -35,32 +57,9 @@ class TestManualSuggestions(BaseTest):
 
         def test_search_functionality(self):
             manual_page = ManualSuggestionsPage(self.driver)
-            manual_page.search_in_grid("kidies")
+            manual_page.search_in_grid("new_keyword")
             # Add assertions for verifying search results in the grid
 
-        # def test_add_new_suggestion(self):
-        #     # manual_page = ManualSuggestionsPage(self.driver) 
-        #     # assert manual_page.click_add_new("English"), f"Failed to set and verify show entries to {"English"}."
-        #     # # Add assertions to verify new suggestion form is displayed 
-        #     add_new_page = ManualSuggestionsPage(self.driver)
-
-        #     # Step 1: Click "Add New"
-        #     add_new_page.click_add_new() 
-
-        #     # Step 2: Fill the form
-        #     store_view = "English"  # or any specific store view
-        #     keyword = "new_keyword"
-        #     synonyms = ["synonym3"]
-        #     weights = ["15"]
-        #     add_new_page.fill_form(store_view, keyword, synonyms, weights)
-        #     print("filled the add new form")
-        #     # Step 3: Submit and verify
-        #     time.sleep(5)
-
-        #     add_new_page.submit_form()
-        #     print("cliecked the submit")
-        #     time.sleep(10)
-        # assert add_new_page.verify_success_message(), "Success message not displayed or incorrect." 
 
         def test_edit_suggestion(self):
             """
@@ -68,7 +67,7 @@ class TestManualSuggestions(BaseTest):
             """
             manual_page = ManualSuggestionsPage(self.driver)
 
-            # Step 1: Navigate to the edit form
+            # Step 1: Navigate to the edit form of the first row
             manual_page.click_edit_button(search_keyword='new_keyword', row_index=0)
 
             # Step 2: Edit a synonym in the edit form
@@ -80,9 +79,14 @@ class TestManualSuggestions(BaseTest):
             time.sleep(10)
 
         def test_Verify_Updated_Synonym(self):
-            manual_page = ManualSuggestionsPage(self.driver)  
+            manual_page = ManualSuggestionsPage(self.driver)
             manual_page.verify_updated_suggestion('new_keyword','UpdatedSynonym')
 
+        def test_delete_suggestion(self):
+            print("delete test started")
+            manual_page = ManualSuggestionsPage(self.driver)
+            manual_page.click_delete_button("new_keyword")
+            # Add assertions to verify deletion success, such as confirmation modal or grid update
 
             # # Step 5: Optionally, verify the updated value in the grid view
             # manual_page.search_in_grid('new_keyword')
@@ -91,17 +95,7 @@ class TestManualSuggestions(BaseTest):
             # print("Synonym updated successfully in the grid view.")   
 
     except Exception as e:
-            logging.error(f"Error in connection {e}") 
-
-        
-        
-
-        # def test_delete_suggestion(self):
-        #     print("delete test started")
-        #     manual_page = ManualSuggestionsPage(self.driver)
-        #     manual_page.click_delete_button("sdas")
-        #     # Add assertions to verify deletion success, such as confirmation modal or grid update
-
+            logging.error(f"Error in connection {e}")
 
     
 
