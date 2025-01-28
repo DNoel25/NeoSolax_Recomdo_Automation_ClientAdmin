@@ -1,3 +1,5 @@
+from _pytest import logging
+
 from Pages.sidebar_page import SideNavigationPage
 from Pages.Page_Search_Results_Management.search_sort_and_filter_page import SearchSortAndFilter
 from Utils.base import BaseTest
@@ -22,7 +24,7 @@ class TestSortAndFilter(BaseTest):
             # Step 1: 
             advanced_sort_and_filter = SearchSortAndFilter(self.driver)
             # Step 2: Select the Store View
-            store_view = "English"   
+            store_view = "Default Store View"
             advanced_sort_and_filter.select_storeview(store_view)
             time.sleep(2) 
 
@@ -76,7 +78,7 @@ class TestSortAndFilter(BaseTest):
             # Step 1: 
             advanced_sort_and_filter = SearchSortAndFilter(self.driver)
             # Step 2: Select the Store View
-            store_view = "English"   
+            store_view = "Default Store View"
             advanced_sort_and_filter.select_storeview(store_view)
             time.sleep(2) 
 
