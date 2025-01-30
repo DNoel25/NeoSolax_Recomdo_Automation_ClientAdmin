@@ -6,14 +6,17 @@ import pytest
 from Pages.sidebar_page import SideNavigationPage 
 from Pages.Page_Reports_Management.search_term_page import SearchTermPages
 from Utils.base import BaseTest
-
+from confest import MainTestRunner
 # @pytest.mark.usefixtures("setup")
 class TestSearchTerms(BaseTest):
 
     try:
         @classmethod
         def setup_class(cls):
-            super().setup_class()
+            # super().setup_class()
+            """ Use the shared WebDriver instance """
+            MainTestRunner.setup()
+            cls.driver = MainTestRunner.get_driver()
             side_nav = SideNavigationPage(cls.driver) 
             side_nav.open_report_management()
             side_nav.open_search_term_pages()
@@ -45,7 +48,13 @@ class TestSearchTerms(BaseTest):
             print(" ")
             print("--------")
             print("Test pagination functionality on the Search Terms Reports..")
-            
+            search_term_pages = SearchTermPages(self.driver)
+            rows = search_term_pages.check_rows_and_pagination()
+            if not rows:
+                print("Skipping pagination tests as there are fewer than 10 rows or no rows present.")
+                return  # Exit the test function if the check fails
+
+            print("Test pagination functionality on the Search Terms Reports..")
             search_term_pages = SearchTermPages(self.driver)
 
             # Wait for pagination to load

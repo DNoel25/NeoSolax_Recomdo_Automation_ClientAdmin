@@ -1,17 +1,23 @@
+from _pytest import logging
+
 from Pages.sidebar_page import SideNavigationPage
 from Pages.Page_Search_Results_Management.search_sort_and_filter_page import SearchSortAndFilter
 from Utils.base import BaseTest
 import time
 import pytest
+from confest import MainTestRunner
 # @pytest.mark.usefixtures("setup")
 class TestSortAndFilter(BaseTest):
     try:
         @classmethod
         def setup_class(cls):
-            super().setup_class()
-            side_nav1 = SideNavigationPage(cls.driver)
-            side_nav1.open_search_results_management()
-            side_nav1.open_sort_and_filter()
+            # super().setup_class()
+            """ Use the shared WebDriver instance """
+            MainTestRunner.setup()
+            cls.driver = MainTestRunner.get_driver()
+            side_nav = SideNavigationPage(cls.driver)
+            side_nav.open_search_results_management()
+            side_nav.open_sort_and_filter()
 
         def test_heading_available(self): 
             search_sort_page = SearchSortAndFilter(self.driver)
@@ -22,7 +28,7 @@ class TestSortAndFilter(BaseTest):
             # Step 1: 
             advanced_sort_and_filter = SearchSortAndFilter(self.driver)
             # Step 2: Select the Store View
-            store_view = "English"   
+            store_view = "Default Store View"
             advanced_sort_and_filter.select_storeview(store_view)
             time.sleep(2) 
 
@@ -76,7 +82,7 @@ class TestSortAndFilter(BaseTest):
             # Step 1: 
             advanced_sort_and_filter = SearchSortAndFilter(self.driver)
             # Step 2: Select the Store View
-            store_view = "English"   
+            store_view = "Default Store View"
             advanced_sort_and_filter.select_storeview(store_view)
             time.sleep(2) 
 

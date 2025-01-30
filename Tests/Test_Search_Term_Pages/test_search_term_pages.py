@@ -11,6 +11,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from Pages.sidebar_page import SideNavigationPage
 from Pages.Page_Search_Term_Pages.search_term_pages_page import SearchTermPages
 from Utils.base import BaseTest
+from confest import MainTestRunner
 
 # @pytest.mark.usefixtures("setup")
 class TestSearchTerms(BaseTest):
@@ -18,7 +19,10 @@ class TestSearchTerms(BaseTest):
     try:
         @classmethod
         def setup_class(cls):
-            super().setup_class()
+            # super().setup_class()
+            """ Use the shared WebDriver instance """
+            MainTestRunner.setup()
+            cls.driver = MainTestRunner.get_driver()
             side_nav = SideNavigationPage(cls.driver) 
             side_nav.open_search_term_pages_main()
             side_nav.open_all_pages()
@@ -193,9 +197,16 @@ class TestSearchTerms(BaseTest):
             save = SearchTermPages(self.driver)
             save.save()
 
+        def teardown_class(self):
+            # Quit the driver once after all tests
+            if self.driver:
+                self.driver.quit()
+                print("Browser closed and teardown complete.")
 
     except Exception as e:
             logging.error(f"Error in connection {e}")
+
+
     
 
 

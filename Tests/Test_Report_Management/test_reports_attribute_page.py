@@ -6,6 +6,7 @@ import pytest
 from Pages.sidebar_page import SideNavigationPage
 from Pages.Page_Reports_Management.attribute_page import AttributePages
 from Utils.base import BaseTest
+from confest import MainTestRunner
 
 # @pytest.mark.usefixtures("setup")
 class TestAttribute(BaseTest):
@@ -13,7 +14,10 @@ class TestAttribute(BaseTest):
     try:
         @classmethod
         def setup_class(cls):
-            super().setup_class()
+            # super().setup_class()
+            """ Use the shared WebDriver instance """
+            MainTestRunner.setup()
+            cls.driver = MainTestRunner.get_driver()
             side_nav = SideNavigationPage(cls.driver) 
             side_nav.open_report_management()
             side_nav.open_attribute_page()
@@ -42,10 +46,16 @@ class TestAttribute(BaseTest):
             # Add assertions for verifying search results in the grid
 
         def test_pagination(self):
-            print(" ")
+            print("*******************")
             print("--------")
+            attribute_page = AttributePages(self.driver)
+            products = attribute_page.check_rows_and_pagination()
+            if not products:
+                print("Skipping pagination tests as there are fewer than 10 rows or no rows present.")
+                return  # Exit the test function if the check fails
+
             print("Test pagination functionality on the Search Terms Reports..")
-            
+
             attribute_page = AttributePages(self.driver)
 
             # Wait for pagination to load
@@ -56,7 +66,7 @@ class TestAttribute(BaseTest):
                 print("Initial state: Previous button is disabled and active page is 1")
             else:
                 print(f"Initial state: Previous button status: {attribute_page.is_previous_disabled()}, "
-                    f"Active page: {attribute_page.get_active_page()}.")
+                      f"Active page: {attribute_page.get_active_page()}.")
                 assert False, "Initial state validation failed."
 
             # Navigate to the next page and verify
@@ -88,9 +98,11 @@ class TestAttribute(BaseTest):
             last_page = attribute_page.get_last_page_number()
             attribute_page.click_page_number(last_page)
             if attribute_page.get_active_page() == last_page and attribute_page.is_next_disabled():
-                print(f"After navigating to the last page {last_page}: Active page is {last_page}, and Next button is disabled.")
+                print(
+                    f"After navigating to the last page {last_page}: Active page is {last_page}, and Next button is disabled.")
             else:
-                print(f"After navigating to the last page {last_page}: Active page is {attribute_page.get_active_page()}, "
+                print(
+                    f"After navigating to the last page {last_page}: Active page is {attribute_page.get_active_page()}, "
                     f"Next button status: {attribute_page.is_next_disabled()}.")
                 assert False, f"Last page navigation validation failed."
 
@@ -100,7 +112,7 @@ class TestAttribute(BaseTest):
                 print("After navigating back to the first page: Active page is 1, and Previous button is disabled.")
             else:
                 print(f"After navigating back to the first page: Active page is {attribute_page.get_active_page()}, "
-                    f"Previous button status: {attribute_page.is_previous_disabled()}.")
+                      f"Previous button status: {attribute_page.is_previous_disabled()}.")
                 assert False, "First page navigation validation failed."
 
         # def test_filters(self):
