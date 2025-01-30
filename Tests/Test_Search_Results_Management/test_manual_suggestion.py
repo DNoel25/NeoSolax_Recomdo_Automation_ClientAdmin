@@ -6,14 +6,17 @@ import pytest
 from Pages.sidebar_page import SideNavigationPage
 from Pages.Page_Search_Results_Management.manual_suggestions_page import ManualSuggestionsPage
 from Utils.base import BaseTest
-
+from confest import MainTestRunner
 # @pytest.mark.usefixtures("setup")
 class TestManualSuggestions(BaseTest):
 
     try:
         @classmethod
         def setup_class(cls):
-            super().setup_class()
+            # super().setup_class()
+            """ Use the shared WebDriver instance """
+            MainTestRunner.setup()
+            cls.driver = MainTestRunner.get_driver()
             side_nav = SideNavigationPage(cls.driver)
             side_nav.open_search_results_management()
             side_nav.open_manual_suggestions()

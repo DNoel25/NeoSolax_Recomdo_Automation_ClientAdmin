@@ -5,15 +5,19 @@ from Pages.Page_Search_Results_Management.search_sort_and_filter_page import Sea
 from Utils.base import BaseTest
 import time
 import pytest
+from confest import MainTestRunner
 # @pytest.mark.usefixtures("setup")
 class TestSortAndFilter(BaseTest):
     try:
         @classmethod
         def setup_class(cls):
-            super().setup_class()
-            side_nav1 = SideNavigationPage(cls.driver)
-            side_nav1.open_search_results_management()
-            side_nav1.open_sort_and_filter()
+            # super().setup_class()
+            """ Use the shared WebDriver instance """
+            MainTestRunner.setup()
+            cls.driver = MainTestRunner.get_driver()
+            side_nav = SideNavigationPage(cls.driver)
+            side_nav.open_search_results_management()
+            side_nav.open_sort_and_filter()
 
         def test_heading_available(self): 
             search_sort_page = SearchSortAndFilter(self.driver)

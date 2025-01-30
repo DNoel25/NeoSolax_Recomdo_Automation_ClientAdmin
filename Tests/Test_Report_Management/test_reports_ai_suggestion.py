@@ -6,15 +6,18 @@ import pytest
 from Pages.sidebar_page import SideNavigationPage
 from Pages.Page_Reports_Management.ai_suggestion_page import AI_Suggestion
 from Utils.base import BaseTest
-
+from confest import MainTestRunner
 # @pytest.mark.usefixtures("setup")
 class TestSearchTerms(BaseTest):
 
     try:
-        @classmethod
+        # @classmethod
         def setup_class(cls):
-            super().setup_class()
-            side_nav = SideNavigationPage(cls.driver) 
+            # super().setup_class()
+            """ Use the shared WebDriver instance """
+            MainTestRunner.setup()
+            cls.driver = MainTestRunner.get_driver()
+            side_nav = SideNavigationPage(cls.driver)
             side_nav.open_report_management()
             side_nav.open_ai_suggestions_page()
             time.sleep(2)

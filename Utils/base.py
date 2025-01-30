@@ -19,9 +19,9 @@ class BaseTest:
         login_page.login("abans_client", "Porsche9000#")
         print("Login successful and setup complete.")
 
-    @classmethod
-    def teardown_class(cls):
-        # Quit the driver once after all tests
-        if cls.driver:
-            cls.driver.quit()
-            print("Browser closed and teardown complete.")
+    # @classmethod
+    # def teardown_class(cls):
+    #     # Quit the driver once after all tests
+    #     if cls.driver:
+    #         cls.driver.quit()
+    #         print("Browser closed and teardown complete.")

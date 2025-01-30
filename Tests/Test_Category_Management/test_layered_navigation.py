@@ -9,14 +9,19 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from confest import MainTestRunner
+
 
 # @pytest.mark.usefixtures("setup")
 class TestCategoryManagement(BaseTest):
 
     try:
-        @classmethod
+        # @classmethod
         def setup_class(cls):
-            super().setup_class()
+            # super().setup_class()
+            """ Use the shared WebDriver instance """
+            MainTestRunner.setup()
+            cls.driver = MainTestRunner.get_driver()
             side_nav = SideNavigationPage(cls.driver)
             side_nav.open_category_management()
             side_nav.open_layered_navigation()
@@ -45,7 +50,7 @@ class TestCategoryManagement(BaseTest):
             # Click on "Expand All"
             layered_navigation.click_expand_all()
             print("Successfully Expanded")
-            
+
         # @pytest.mark.order(2)
         def test_collapse_all(self):
             print(" ")
@@ -62,7 +67,7 @@ class TestCategoryManagement(BaseTest):
 
             # First, expand all categories to ensure we can collapse them
             layered_navigation.click_expand_all()
-            
+
             # Click on "Collapse All"
             layered_navigation.click_collapse_all()
             print("Successfully Collapsed")
@@ -79,13 +84,13 @@ class TestCategoryManagement(BaseTest):
             layered_navigation.select_first_category()
             time.sleep(2)
 
-            
+
             # Step 2: Select the Sort By in Layered Navigation
             sort_by_option = "Select only selected attributes in order"
             # sort_by_option = "Select all attributes"
             layered_navigation.select_sort_option_layered(sort_by_option)
             time.sleep(2)
-  
+
             # Search in the grid and if its not assigned then assign the attribute to the right side and save
             if layered_navigation.search_in_unassign_box("age"):
                 layered_navigation.enter_15_in_searched_field("Age")  # Enter 15 if the attribute is found
@@ -134,7 +139,7 @@ class TestCategoryManagement(BaseTest):
         #Grid view functions tests are as follows
         # @pytest.mark.order(6)
         def test_navigation_gridview(self):
-            layered_navigation = LayeredNavigationPage(self.driver) 
+            layered_navigation = LayeredNavigationPage(self.driver)
 
             print("-----------")
             print("Testing the Grid View of an category")
@@ -142,9 +147,9 @@ class TestCategoryManagement(BaseTest):
             self.driver.refresh()
             time.sleep(2)
             #Navigate to layered navigations for the category
-            layered_navigation.click_expand_all() 
+            layered_navigation.click_expand_all()
             # Locate the first category button in the tree
-            layered_navigation.select_first_category() 
+            layered_navigation.select_first_category()
             time.sleep(2)
 
             #locate and go to grid view
@@ -168,7 +173,7 @@ class TestCategoryManagement(BaseTest):
             # assert layered_navigation.search_in_grid(value), f"Failed to search an product using {value}."
             layered_navigation.refresh_page()
             time.sleep(3)
-        
+
         @pytest.mark.order(9)
         def test_auto_manual_sort(self):
             layered_navigation = LayeredNavigationPage(self.driver)
@@ -238,7 +243,7 @@ class TestCategoryManagement(BaseTest):
         # def test_disable_enable_of_product(self):
         #     layered_navigation = LayeredNavigationPage(self.driver)
         #     layered_navigation.enable_first_product()
-        
+
 
     except Exception as e:
-            logging.error(f"Error in connection {e}") 
+            logging.error(f"Error in connection {e}")
